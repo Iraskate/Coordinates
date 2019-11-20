@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Coordinates</string>
+    <string name="get_coordinates">Get Coordinates</string>
+    <string name="view_coordinates">View Coordinates</string>
+    <string name="delete_coordinates">Delete Coordinates</string>
+    <string name="view_map">View Map</string>
+    <string name="map_key" translatable="false"> AIzaSyCj6eqnGp0kyyxOETZCxttKCG0tpU_QBQ8 </string>
+    <string name="start_service">Start Service</string>
+    <string name="stop_service">Stop Service</string>
+    <string name="view_branding">View Branding</string>
+</resources>
