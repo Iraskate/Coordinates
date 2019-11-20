@@ -25,7 +25,7 @@ import static com.example.coordinates.App.CHANNEL_ID;
 public class LocationService extends Service {
 
     private final static int UPDATE_TIME = 1000 * 60 * 5; //Time between location updates in milliseconds
-    private final static double UPDATE_DISTANCE = 0.1; //Distance between location updates in kilometers
+    private final static double UPDATE_DISTANCE = 0.050; //Distance between location updates in kilometers
 
     private boolean insertionCompleted;
 
