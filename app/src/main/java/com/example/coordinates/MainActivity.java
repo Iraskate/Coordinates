@@ -9,15 +9,22 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button buttonStartService, buttonStopService, buttonViewCoordinates, buttonDeleteCoordinates, buttonViewMap, buttonViewBranding;
+    private Button buttonStartService, buttonStopService,
+            buttonViewCoordinates, buttonDeleteCoordinates,
+            buttonViewMap, buttonViewBranding,
+            buttonViewFinalCoordinates, buttonDeleteFinalCoordinates,
+            buttonClusterLocations;
 
     DatabaseHelper myDb;
 
@@ -33,9 +40,15 @@ public class MainActivity extends AppCompatActivity {
             enable_buttons();
 
         viewCoordinates();
+        viewFinalCoordinates();
+
         deleteCoordinates();
+        deleteFinalCoordinates();
+
         openMap();
         openBranding();
+
+        clusterLocations();
 
     }
 
@@ -49,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
         buttonDeleteCoordinates = findViewById(R.id.button_delete_coordinates);
         buttonViewMap = findViewById(R.id.button_view_map);
         buttonViewBranding = findViewById(R.id.button_view_branding);
+        buttonViewFinalCoordinates = findViewById(R.id.button_view_final_coordinates);
+        buttonDeleteFinalCoordinates = findViewById(R.id.button_delete_final_coordinates);
+        buttonClusterLocations = findViewById(R.id.button_cluster_locations);
 
     }
 
@@ -121,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        Cursor res = myDb.getAllData();
+                        Cursor res = myDb.getAllData(DatabaseHelper.TABLE_NAME_1);
 
                         if(res.getCount() == 0) { //No records error
 
@@ -134,9 +150,12 @@ public class MainActivity extends AppCompatActivity {
 
                         while(res.moveToNext()) {
 
-                            buffer.append(DatabaseHelper.COL_1 + ": ").append(res.getString(0)).append("\n");
-                            buffer.append(DatabaseHelper.COL_2 + ": ").append(res.getString(1)).append("\n");
-                            buffer.append(DatabaseHelper.COL_3 + ": ").append(res.getString(2)).append("\n\n");
+                            buffer.append(DatabaseHelper.COL_1_1 + ": ").append(res.getString(0)).append("\n");
+                            buffer.append(DatabaseHelper.COL_2_1 + ": ").append(res.getString(1)).append("\n");
+                            buffer.append(DatabaseHelper.COL_3_1 + ": ").append(res.getString(2)).append("\n");
+                            buffer.append(DatabaseHelper.COL_4_1 + ": ").append(res.getString(3)).append("\n");
+                            buffer.append(DatabaseHelper.COL_5_1 + ": ").append(res.getString(4)).append("\n");
+                            buffer.append(DatabaseHelper.COL_6_1 + ": ").append(res.getString(5)).append("\n\n");
 
                         }
 
@@ -148,13 +167,49 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void viewFinalCoordinates() {
+
+        buttonViewFinalCoordinates.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Cursor res = myDb.getAllData(DatabaseHelper.TABLE_NAME_2);
+
+                if(res.getCount() == 0) { //No records error
+
+                    showMessage("Error", "No Final Coordinates Found");
+                    return;
+
+                }
+
+                StringBuilder buffer = new StringBuilder();
+
+                while(res.moveToNext()) {
+
+                    buffer.append(DatabaseHelper.COL_1_2 + ": ").append(res.getString(0)).append("\n");
+                    buffer.append(DatabaseHelper.COL_2_2 + ": ").append(res.getString(1)).append("\n");
+                    buffer.append(DatabaseHelper.COL_3_2 + ": ").append(res.getString(2)).append("\n");
+                    buffer.append(DatabaseHelper.COL_4_2 + ": ").append(res.getString(3)).append("\n");
+                    buffer.append(DatabaseHelper.COL_5_2 + ": ").append(res.getString(4)).append("\n");
+                    buffer.append(DatabaseHelper.COL_6_2 + ": ").append(res.getString(5)).append("\n");
+                    buffer.append(DatabaseHelper.COL_7_2 + ": ").append(res.getString(6)).append("\n\n");
+
+                }
+
+                showMessage("Final Coordinates", buffer.toString());
+
+            }
+        });
+
+    }
+
     private void deleteCoordinates() {
 
         buttonDeleteCoordinates.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                int deletedRows = myDb.deleteData();
+                int deletedRows = myDb.deleteData(DatabaseHelper.TABLE_NAME_1);
 
                 if(deletedRows > 0)
                     Toast.makeText(MainActivity.this, deletedRows + " Rows Deleted", Toast.LENGTH_LONG).show();
@@ -167,38 +222,51 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void deleteFinalCoordinates() {
+
+        buttonDeleteFinalCoordinates.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int deletedRows = myDb.deleteData(DatabaseHelper.TABLE_NAME_2);
+
+                if(deletedRows > 0)
+                    Toast.makeText(MainActivity.this, deletedRows + " Rows Deleted", Toast.LENGTH_LONG).show();
+                else
+                    Toast.makeText(MainActivity.this, "No Rows Deleted", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+    }
+
     private void openMap() {
 
         buttonViewMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String latitude = null, longitude = null;
+                Cursor res = myDb.getAllData(DatabaseHelper.TABLE_NAME_2);
 
-                Cursor res = myDb.getLastRecord();
+                if(res.getCount() > 0) {
 
-                while(res.moveToNext()) {
+                    if (haveNetworkConnection()) {
 
-                    latitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_2));
-                    longitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_3));
-                }
+                        Intent googleMaps = new Intent(MainActivity.this, MapActivity.class);
 
-                if(latitude == null || longitude == null) {
+                        googleMaps.putExtra("id", -1);
 
-                    showMessage("Error", "No coordinates available, start the service.");
+                        startActivity(googleMaps);
 
-                }else {
-
-                    Intent googleMaps = new Intent(MainActivity.this, MapActivity.class);
-
-                    googleMaps.putExtra("latitude", latitude);
-                    googleMaps.putExtra("longitude", longitude);
-
-                    startActivity(googleMaps);
+                    } else
+                        showMessage("Error", "No internet connection.");
 
                 }
+                else
+                    showMessage("Error", "No Final Coordinates Found");
 
             }
+
         });
 
     }
@@ -209,11 +277,129 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent brandingIntent = new Intent(MainActivity.this, BrandingActivity.class);
-                startActivity(brandingIntent);
+                Cursor res = myDb.getAllData(DatabaseHelper.TABLE_NAME_2);
+
+                if(res.getCount() == 0)
+                    showMessage("Error", "No Final Coordinates Found");
+                else {
+
+                    Intent brandingIntent = new Intent(MainActivity.this, BrandingActivity.class);
+                    startActivity(brandingIntent);
+
+                }
 
             }
         });
+
+    }
+
+    private void clusterLocations() {
+
+        buttonClusterLocations.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                clusterAllLocations();
+
+                showMessage("Clustering Complete", "View the final locations on 'View Final Coordinates'");
+
+            }
+        });
+
+    }
+
+    private void clusterAllLocations() {
+
+        int currentID;
+
+        String currentTempLatitude, currentTempLongitude, nextTempLatitude, nextTempLongitude;
+
+        myDb.duplicateDatabase(DatabaseHelper.TABLE_NAME_3, DatabaseHelper.TABLE_NAME_1);
+
+        Cursor mainTable = myDb.getAllData(DatabaseHelper.TABLE_NAME_1);
+
+        for(int i = 0; i < mainTable.getCount(); i++) {
+
+            mainTable.moveToPosition(i);
+
+            int totalTimeSpent = 0;
+
+            currentTempLatitude = mainTable.getString(1);
+            currentTempLongitude = mainTable.getString(2);
+
+            Cursor compareTable = myDb.getAllData(DatabaseHelper.TABLE_NAME_3);
+
+            for(int j = 0; j < compareTable.getCount(); j++) {
+
+                compareTable.moveToPosition(j);
+
+                currentID = compareTable.getInt(0);
+                nextTempLatitude = compareTable.getString(1);
+                nextTempLongitude = compareTable.getString(2);
+
+                if (LocationService.distance(Double.parseDouble(nextTempLatitude), Double.parseDouble(nextTempLongitude), Double.parseDouble(currentTempLatitude), Double.parseDouble(currentTempLongitude)) < LocationService.UPDATE_DISTANCE) {
+
+                    if (myDb.deleteDataByRowID(DatabaseHelper.TABLE_NAME_3, currentID) > 0)
+                        totalTimeSpent++;
+
+                }
+
+            }
+
+            if(totalTimeSpent > 0) {
+
+                Cursor finalTable = myDb.getAllData(DatabaseHelper.TABLE_NAME_2);
+
+                totalTimeSpent = (totalTimeSpent * LocationService.UPDATE_TIME) / 60000;
+
+                if(finalTable.getCount() == 0) {
+
+                    if (myDb.insertData(DatabaseHelper.TABLE_NAME_2,
+                            currentTempLatitude,
+                            currentTempLongitude,
+                            mainTable.getString(3),
+                            mainTable.getString(4),
+                            mainTable.getString(5),
+                            String.valueOf(totalTimeSpent),
+                            0,
+                            null)) {
+
+                        Log.d("Insertion", "Completed");
+
+                    }
+
+                }
+                else {
+
+                    int lastListViewNumber = 0;
+
+                    Cursor finalTableLastListViewNumber = myDb.getLastRecord(DatabaseHelper.TABLE_NAME_2);
+
+                    while(finalTableLastListViewNumber.moveToNext())
+                        lastListViewNumber = finalTableLastListViewNumber.getInt(finalTableLastListViewNumber.getColumnIndex(DatabaseHelper.COL_8_2));
+
+                    if (myDb.insertData(DatabaseHelper.TABLE_NAME_2,
+                            currentTempLatitude,
+                            currentTempLongitude,
+                            mainTable.getString(3),
+                            mainTable.getString(4),
+                            mainTable.getString(5),
+                            String.valueOf(totalTimeSpent),
+                            lastListViewNumber + 1,
+                            null)) {
+
+                        Log.d("Insertion", "Completed");
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        myDb.deleteData(DatabaseHelper.TABLE_NAME_1);
+        myDb.deleteData(DatabaseHelper.TABLE_NAME_3);
 
     }
 
@@ -226,6 +412,24 @@ public class MainActivity extends AppCompatActivity {
         builder.setMessage(message);
         builder.show();
 
+    }
+
+    private boolean haveNetworkConnection() {
+
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 
 }

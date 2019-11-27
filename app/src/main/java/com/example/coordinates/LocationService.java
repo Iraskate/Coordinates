@@ -20,18 +20,22 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import static com.example.coordinates.App.CHANNEL_ID;
 
 public class LocationService extends Service {
 
-    private final static int UPDATE_TIME = 1000 * 60 * 5; //Time between location updates in milliseconds
-    private final static double UPDATE_DISTANCE = 0.050; //Distance between location updates in kilometers
+    public final static int UPDATE_TIME = 1000 * 60 * 5; //Time between location updates in milliseconds
+    public final static double UPDATE_DISTANCE = 0.050; //Distance between location updates in kilometers
 
     private boolean insertionCompleted;
 
     private PowerManager.WakeLock mWakeLock;
 
-    private String latitude, longitude;
+    private String latitude, longitude, speed, altitude, dateTime;
     private String lastLatitude, lastLongitude;
     private String secondToLastLatitude, secondToLastLongitude;
 
@@ -56,6 +60,8 @@ public class LocationService extends Service {
     @SuppressLint("MissingPermission")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        Log.d("Service", "Started");
 
         mWakeLock.acquire();
 
@@ -124,7 +130,7 @@ public class LocationService extends Service {
 
                 insertionCompleted = false;
 
-                getCoordinates(locationResult); //Gets coordinates
+                getLocationInformation(locationResult); //Gets coordinates
                 getLastLocation();
                 getSecondToLastLocation();
                 saveLocationToDatabase();
@@ -134,16 +140,22 @@ public class LocationService extends Service {
 
     }
 
-    private void getCoordinates(LocationResult locationResult) {
+    private void getLocationInformation(LocationResult locationResult) {
 
         this.latitude = String.valueOf(locationResult.getLastLocation().getLatitude());
         this.longitude = String.valueOf(locationResult.getLastLocation().getLongitude());
+        this.speed = String.valueOf(locationResult.getLastLocation().getSpeed());
+        this.altitude = String.valueOf(locationResult.getLastLocation().getAltitude());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd/MM/yyyy, HH:mm:ss", Locale.getDefault());
+
+        this.dateTime = sdf.format(new Date());
 
     }
 
-    private boolean insertCoordinates(String latitude, String longitude) {
+    private boolean insertCoordinates(String latitude, String longitude, String speed, String altitude, String dateTime) {
 
-        boolean inserted = myDb.insertData(latitude, longitude); //Insert coordinates
+        boolean inserted = myDb.insertData(DatabaseHelper.TABLE_NAME_1, latitude, longitude, speed, altitude, dateTime, null, 0, null); //Insert coordinates
 
         //Check if insertion is completed
         if(inserted)
@@ -157,41 +169,33 @@ public class LocationService extends Service {
 
     private void getLastLocation() {
 
-        Cursor res = myDb.getLastRecord();
+        Cursor res = myDb.getLastRecord(DatabaseHelper.TABLE_NAME_1);
 
         if(res.getCount() == 0) {
-            Log.d("Last Location", "0 records");
             return;
         }
 
         while(res.moveToNext()) {
 
-            this.lastLatitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_2));
-            this.lastLongitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_3));
+            this.lastLatitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_2_1));
+            this.lastLongitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_3_1));
         }
-
-        Log.d("Latitude", this.lastLatitude);
-        Log.d("Longitude", this.lastLongitude);
 
     }
 
     private void getSecondToLastLocation() {
 
-        Cursor res = myDb.getSecondToLastRecord();
+        Cursor res = myDb.getSecondToLastRecord(DatabaseHelper.TABLE_NAME_1);
 
         if(res.getCount() == 0) {
-            Log.d("Second To Last Location", "0 records");
             return;
         }
 
         while(res.moveToNext()) {
 
-            this.secondToLastLatitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_2));
-            this.secondToLastLongitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_3));
+            this.secondToLastLatitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_2_1));
+            this.secondToLastLongitude = res.getString(res.getColumnIndex(DatabaseHelper.COL_3_1));
         }
-
-        Log.d("Latitude before", this.secondToLastLatitude);
-        Log.d("Longitude before", this.secondToLastLongitude);
 
     }
 
@@ -203,43 +207,30 @@ public class LocationService extends Service {
             if (distance(Double.parseDouble(lastLatitude), Double.parseDouble(lastLongitude), Double.parseDouble(latitude), Double.parseDouble(longitude)) > UPDATE_DISTANCE) {
 
                 //Check to see if the current location is the same as the second to last location
-                /*if(distance(Double.parseDouble(secondToLastLatitude), Double.parseDouble(secondToLastLongitude), Double.parseDouble(latitude), Double.parseDouble(longitude)) < UPDATE_DISTANCE) {
+                if (distance(Double.parseDouble(secondToLastLatitude), Double.parseDouble(secondToLastLongitude), Double.parseDouble(latitude), Double.parseDouble(longitude)) < UPDATE_DISTANCE) {
 
-                    int deletedRows = myDb.deleteLastRow();
+                    int deletedRows = myDb.deleteLastRow(DatabaseHelper.TABLE_NAME_1);
 
-                    if(deletedRows > 0)
+                    if (deletedRows > 0)
                         Log.d("Last Row", "Deleted");
-
-                }*/
-
-                insertionCompleted = insertCoordinates(latitude, longitude); //Sends coordinates to SQLite database
-
-                if (insertionCompleted) { //Saves database to SD Card, if there is one available
-
-                    Log.d("Location", "Updated");
-                    myDb.saveDatabaseToSDCard();
 
                 }
 
             }
 
         }
-        else {
 
-            insertionCompleted = insertCoordinates(latitude, longitude); //Sends coordinates to SQLite database
+        insertionCompleted = insertCoordinates(latitude, longitude, speed, altitude, dateTime); //Sends coordinates to SQLite database
 
-            if (insertionCompleted) { //Saves database to SD Card, if there is one available
+        if (insertionCompleted) { //Saves database to SD Card, if there is one available
 
-                Log.d("Location", "Updated");
-                myDb.saveDatabaseToSDCard();
-
-            }
+            myDb.saveDatabaseToSDCard();
 
         }
 
     }
 
-    private double distance(double lastLat, double lastLong, double currentLat, double currentLong) {
+    public static double distance(double lastLat, double lastLong, double currentLat, double currentLong) {
 
         double earthRadius = 6371; // in kilometers, change to 3958.75 for miles output
 

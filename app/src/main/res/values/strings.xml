@@ -8,4 +8,10 @@
     <string name="start_service">Start Service</string>
     <string name="stop_service">Stop Service</string>
     <string name="view_branding">View Branding</string>
+    <string name="view_final_coordinates">View Final Coordinates</string>
+    <string name="delete_final_coordinates">Delete Final Coordinates</string>
+    <string name="cluster_locations">Cluster Locations</string>
+    <string name="add_name">Add Name</string>
+    <string name="add">Add</string>
+    <string name="Search">Search</string>
 </resources>

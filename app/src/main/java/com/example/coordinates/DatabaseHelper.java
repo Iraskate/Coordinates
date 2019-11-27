@@ -17,15 +17,39 @@ import java.nio.channels.FileChannel;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "Coordinates.db";
-    private static final String TABLE_NAME = "coordinates_table";
+    private static final String DATABASE_NAME = "location_info.db";
 
-    static final String COL_1 = "ID";
-    static final String COL_2 = "LATITUDE";
-    static final String COL_3 = "LONGITUDE";
+    static final String TABLE_NAME_1 = "original_coordinates_table";
+    static final String TABLE_NAME_2 = "final_coordinates_table";
 
-    public String databasePath;
+    static final String TABLE_NAME_3 = "original_coordinates_table_copied";
 
+    static final String COL_1_1 = "ID";
+    static final String COL_2_1 = "LATITUDE";
+    static final String COL_3_1 = "LONGITUDE";
+    static final String COL_4_1 = "SPEED";
+    static final String COL_5_1 = "ALTITUDE";
+    static final String COL_6_1 = "DATETIME";
+
+    static final String COL_1_2 = "ID";
+    static final String COL_2_2 = "LATITUDE";
+    static final String COL_3_2 = "LONGITUDE";
+    static final String COL_4_2 = "SPEED";
+    static final String COL_5_2 = "ALTITUDE";
+    static final String COL_6_2 = "DATETIME";
+    static final String COL_7_2 = "TIME_SPENT";
+    static final String COL_8_2 = "LISTVIEW_LOCATION";
+    static final String COL_9_2 = "LOCATION_NAME";
+
+    private static final String COL_1_3 = "ID";
+    private static final String COL_2_3 = "LATITUDE";
+    private static final String COL_3_3 = "LONGITUDE";
+    private static final String COL_4_3 = "SPEED";
+    private static final String COL_5_3 = "ALTITUDE";
+    private static final String COL_6_3 = "DATETIME";
+
+
+    private String databasePath;
 
     DatabaseHelper(@Nullable Context context) {
 
@@ -38,30 +62,170 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COL_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_2 + " TEXT, " + COL_3 + " TEXT) ");
+        db.execSQL("CREATE TABLE " + TABLE_NAME_1 + " (" + COL_1_1 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_2_1 + " TEXT, " + COL_3_1 + " TEXT, " + COL_4_1 + " TEXT, " + COL_5_1 + " TEXT, " + COL_6_1 + " TEXT)");
+        db.execSQL("CREATE TABLE " + TABLE_NAME_2 + " (" + COL_1_2 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_2_2 + " TEXT, " + COL_3_2 + " TEXT, " + COL_4_2 + " TEXT, " + COL_5_2 + " TEXT, " + COL_6_2 + " TEXT, " + COL_7_2 + " TEXT, " + COL_8_2 + " INTEGER, " + COL_9_2 + " TEXT)");
+
+        db.execSQL("CREATE TABLE " + TABLE_NAME_3 + " (" + COL_1_3 + " INTEGER PRIMARY KEY AUTOINCREMENT, " + COL_2_3 + " TEXT, " + COL_3_3 + " TEXT, " + COL_4_3 + " TEXT, " + COL_5_3 + " TEXT, " + COL_6_3 + " TEXT)");
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_1);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_2);
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_3);
 
         onCreate(db);
 
     }
 
-    boolean insertData(String coordinates_latitude, String coordinates_longitude) {
+    boolean insertData(String tableName, String coordinates_latitude, String coordinates_longitude, String coordinates_speed, String coordinates_altitude, String coordinates_dateTime, String coordinates_timeSpent, int listeviewLocation, String locationName) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(COL_2, coordinates_latitude);
-        contentValues.put(COL_3, coordinates_longitude);
+        if(tableName.equals(TABLE_NAME_1)) {
 
-        long result = db.insert(TABLE_NAME, null, contentValues);
+            contentValues.put(COL_2_1, coordinates_latitude);
+            contentValues.put(COL_3_1, coordinates_longitude);
+            contentValues.put(COL_4_1, coordinates_speed);
+            contentValues.put(COL_5_1, coordinates_altitude);
+            contentValues.put(COL_6_1, coordinates_dateTime);
+
+        }
+        else {
+
+            contentValues.put(COL_2_2, coordinates_latitude);
+            contentValues.put(COL_3_2, coordinates_longitude);
+            contentValues.put(COL_4_2, coordinates_speed);
+            contentValues.put(COL_5_2, coordinates_altitude);
+            contentValues.put(COL_6_2, coordinates_dateTime);
+            contentValues.put(COL_7_2, coordinates_timeSpent);
+            contentValues.put(COL_8_2, listeviewLocation);
+            contentValues.put(COL_9_2, locationName);
+
+        }
+
+        long result = db.insert(tableName, null, contentValues);
 
         return result != -1; //If result is -1 return false, else return true
+
+    }
+
+    public int updateLocationName(int id, String locationName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(COL_9_2, locationName);
+
+        return db.update(TABLE_NAME_2, contentValues, COL_8_2 + "=" + id, null);
+
+    }
+
+    public int updateLocationPosition(int locationPosition, int id) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(COL_8_2, locationPosition);
+
+        return db.update(TABLE_NAME_2, contentValues, COL_1_2 + "=" + id, null);
+
+    }
+
+    Integer deleteDataByRowID(String tableName, int id) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if(tableName.equals(TABLE_NAME_1))
+            return db.delete(tableName, COL_1_1 + "=" + id, null);
+        else if(tableName.equals(TABLE_NAME_2))
+            return db.delete(tableName, COL_1_2 + "=" + id, null);
+        else
+            return db.delete(tableName, COL_1_3 + "=" + id, null);
+
+    }
+
+    Integer deleteDataByRowLocationID(int locationID) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        return db.delete(TABLE_NAME_2, COL_8_2 + "=" + locationID, null);
+
+    }
+
+    Integer deleteData(String tableName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        return db.delete(tableName, "1", null);
+
+    }
+
+    Integer deleteLastRow(String tableName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if(tableName.equals(TABLE_NAME_1))
+            return db.delete(tableName, COL_1_1 + " = (SELECT MAX(" + COL_1_1 + ") FROM " + tableName + ")", null);
+        else if(tableName.equals(TABLE_NAME_2))
+            return db.delete(tableName, COL_1_2 + " = (SELECT MAX(" + COL_1_2 + ") FROM " + tableName + ")", null);
+        else
+            return db.delete(tableName, COL_1_3 + " = (SELECT MAX(" + COL_1_2 + ") FROM " + tableName + ")", null);
+
+
+    }
+
+    Cursor getAllData(String tableName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        return db.rawQuery("SELECT * FROM " + tableName, null);
+
+    }
+
+    Cursor getDataByLocation(int listViewLocation) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME_2 + " WHERE " + COL_8_2 + "=" + listViewLocation, null);
+
+    }
+
+    Cursor getLastRecord(String tableName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if(tableName.equals(TABLE_NAME_1))
+            return db.rawQuery("SELECT * FROM " + tableName + " ORDER BY " + COL_1_1 + " DESC LIMIT 1", null);
+        else
+            return db.rawQuery("SELECT * FROM " + tableName + " ORDER BY " + COL_1_2 + " DESC LIMIT 1", null);
+
+    }
+
+    Cursor getSecondToLastRecord(String tableName) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        if(tableName.equals(TABLE_NAME_1))
+            return db.rawQuery("SELECT * FROM " + tableName + " ORDER BY " + COL_1_1 + " DESC LIMIT 2", null);
+        else
+            return db.rawQuery("SELECT * FROM " + tableName + " ORDER BY " + COL_1_2 + " DESC LIMIT 2", null);
+
+    }
+
+    void duplicateDatabase(String destinationTable, String sourceTable) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(destinationTable, "1", null);
+
+        db.execSQL("INSERT INTO " + destinationTable + " SELECT * FROM " + sourceTable);
 
     }
 
@@ -98,44 +262,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         } catch (Exception e) {
         }
-
-    }
-
-    Integer deleteData() {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        return db.delete(TABLE_NAME, "1", null);
-
-    }
-
-    Integer deleteLastRow() {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        return db.delete(TABLE_NAME, COL_1 + " = (SELECT MAX(" + COL_1 + ") FROM " + TABLE_NAME + ")", null);
-
-    }
-
-    Cursor getAllData() {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-
-    }
-
-    Cursor getLastRecord() {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COL_1 + " DESC LIMIT 1", null);
-
-    }
-
-    Cursor getSecondToLastRecord() {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COL_1 + " DESC LIMIT 2", null);
 
     }
 
