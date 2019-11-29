@@ -13,7 +13,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -354,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(finalTable.getCount() == 0) {
 
-                    if (myDb.insertData(DatabaseHelper.TABLE_NAME_2,
+                     myDb.insertData(DatabaseHelper.TABLE_NAME_2,
                             currentTempLatitude,
                             currentTempLongitude,
                             mainTable.getString(3),
@@ -362,11 +361,7 @@ public class MainActivity extends AppCompatActivity {
                             mainTable.getString(5),
                             String.valueOf(totalTimeSpent),
                             0,
-                            null)) {
-
-                        Log.d("Insertion", "Completed");
-
-                    }
+                            null);
 
                 }
                 else {
@@ -378,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
                     while(finalTableLastListViewNumber.moveToNext())
                         lastListViewNumber = finalTableLastListViewNumber.getInt(finalTableLastListViewNumber.getColumnIndex(DatabaseHelper.COL_8_2));
 
-                    if (myDb.insertData(DatabaseHelper.TABLE_NAME_2,
+                    myDb.insertData(DatabaseHelper.TABLE_NAME_2,
                             currentTempLatitude,
                             currentTempLongitude,
                             mainTable.getString(3),
@@ -386,11 +381,7 @@ public class MainActivity extends AppCompatActivity {
                             mainTable.getString(5),
                             String.valueOf(totalTimeSpent),
                             lastListViewNumber + 1,
-                            null)) {
-
-                        Log.d("Insertion", "Completed");
-
-                    }
+                            null);
 
                 }
 

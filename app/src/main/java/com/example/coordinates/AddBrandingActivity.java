@@ -114,10 +114,9 @@ public class AddBrandingActivity extends AppCompatActivity {
                         //Finish previous and current activity
                         Intent finishIntent = new Intent("finish");
                         sendBroadcast(finishIntent);
-
                         finish();
 
-                        //Open new Branding Activity
+                        //Start new Branding Activity
                         Intent intent = new Intent(AddBrandingActivity.this, BrandingActivity.class);
                         startActivity(intent);
 

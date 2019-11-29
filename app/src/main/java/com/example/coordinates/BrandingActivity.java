@@ -25,17 +25,18 @@ import java.util.ArrayList;
 
 public class BrandingActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
-    DatabaseHelper myDb;
+    private BroadcastReceiver broadcastReceiver;
 
-    EditText searchList;
-    ListView locations;
-    ArrayList<String> listItem;
-    ArrayAdapter adapter;
+    private DatabaseHelper myDb;
+
+    private EditText searchList;
+    private ListView locations;
+    private ArrayList<String> listItem;
+    private ArrayAdapter adapter;
 
     private String latitude, longitude, locationName;
-    int timeSpentOnLocation;
 
-    int positionOfElement;
+    private int timeSpentOnLocation, positionOfElement;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,14 @@ public class BrandingActivity extends AppCompatActivity implements PopupMenu.OnM
         viewListView();
 
         addBroadcastReceiver();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unregisterReceiver(broadcastReceiver);
 
     }
 
@@ -148,7 +157,7 @@ public class BrandingActivity extends AppCompatActivity implements PopupMenu.OnM
         switch (item.getItemId()) {
 
             case R.id.item1:
-                showMap(latitude, longitude, timeSpentOnLocation, positionOfElement);
+                showMap();
                 return true;
 
             case R.id.item2:
@@ -166,17 +175,17 @@ public class BrandingActivity extends AppCompatActivity implements PopupMenu.OnM
 
     }
 
-    private void showMap(String latitude, String longitude, int timeSpentOnLocation, int id) {
+    private void showMap() {
 
         if(haveNetworkConnection()) {
 
             Intent googleMaps = new Intent(BrandingActivity.this, MapActivity.class);
 
-            googleMaps.putExtra("latitude", latitude);
-            googleMaps.putExtra("longitude", longitude);
-            googleMaps.putExtra("timeSpentOnLocation", timeSpentOnLocation);
+            googleMaps.putExtra("latitude", this.latitude);
+            googleMaps.putExtra("longitude", this.longitude);
+            googleMaps.putExtra("timeSpentOnLocation", this.timeSpentOnLocation);
 
-            googleMaps.putExtra("id", id);
+            googleMaps.putExtra("id", this.positionOfElement);
 
             startActivity(googleMaps);
 
@@ -228,12 +237,8 @@ public class BrandingActivity extends AppCompatActivity implements PopupMenu.OnM
             viewData();
 
         }
-        else {
-
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-
-        }
+        else
+            finish();
 
     }
 
@@ -268,7 +273,7 @@ public class BrandingActivity extends AppCompatActivity implements PopupMenu.OnM
 
     private void addBroadcastReceiver() {
 
-        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
 
