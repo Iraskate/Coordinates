@@ -1,4 +1,4 @@
-package com.example.coordinates;
+package com.example.coordinates.location.services;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -15,6 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.example.coordinates.location.misc.DatabaseHelper;
+import com.example.coordinates.location.activities.LocationActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -24,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.example.coordinates.App.CHANNEL_ID;
+import static com.example.coordinates.main.App.CHANNEL_1_ID;
 
 public class LocationService extends Service {
 
@@ -52,7 +54,7 @@ public class LocationService extends Service {
         fusedLocationProviderClient = new FusedLocationProviderClient(this);
 
         initWakeLock(); //Creates a wakelock
-        initNotification(); //Creates a notification if SDK version is > 26
+        initServiceNotification(); //Creates a notification if SDK version is > 26
         initLocationCallback();
 
     }
@@ -61,7 +63,7 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Log.d("Service", "Started");
+        Log.d("Location Service", "Started");
 
         mWakeLock.acquire();
 
@@ -76,7 +78,7 @@ public class LocationService extends Service {
 
         super.onDestroy();
 
-        Log.d("Service", "Destroyed");
+        Log.d("Location Service", "Destroyed");
 
         if(fusedLocationProviderClient != null)
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
@@ -94,13 +96,13 @@ public class LocationService extends Service {
 
     }
 
-    private void initNotification() {
+    private void initServiceNotification() {
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, LocationActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,0, notificationIntent, 0);
 
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Service")
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_1_ID)
+                .setContentTitle("Location Service")
                 .setContentText("Coordinates Location Running")
                 .setContentIntent(pendingIntent)
                 .build();
@@ -227,6 +229,8 @@ public class LocationService extends Service {
             myDb.saveDatabaseToSDCard();
 
         }
+
+        stopSelf();
 
     }
 

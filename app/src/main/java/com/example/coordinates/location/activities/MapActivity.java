@@ -1,16 +1,17 @@
-package com.example.coordinates;
+package com.example.coordinates.location.activities;
 
 import androidx.fragment.app.FragmentActivity;
 
 import android.database.Cursor;
 import android.os.Bundle;
 
+import com.example.coordinates.R;
+import com.example.coordinates.location.misc.DatabaseHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;

@@ -1,4 +1,4 @@
-package com.example.coordinates;
+package com.example.coordinates.location.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -17,7 +17,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.example.coordinates.R;
+import com.example.coordinates.location.misc.DatabaseHelper;
+import com.example.coordinates.location.services.LocationService;
+
+public class LocationActivity extends AppCompatActivity {
 
     private Button buttonStartService, buttonStopService,
             buttonViewCoordinates, buttonDeleteCoordinates,
@@ -25,13 +29,13 @@ public class MainActivity extends AppCompatActivity {
             buttonViewFinalCoordinates, buttonDeleteFinalCoordinates,
             buttonClusterLocations;
 
-    DatabaseHelper myDb;
+    private DatabaseHelper myDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_location);
 
         init(); //Initialize variables
 
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent serviceIntent = new Intent(getApplicationContext(), LocationService.class);
 
                 //Checks if the SDK version is higher than 26 to act accordingly
-                ContextCompat.startForegroundService(MainActivity.this, serviceIntent);
+                ContextCompat.startForegroundService(LocationActivity.this, serviceIntent);
 
             }
         });
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent serviceIntent = new Intent(MainActivity.this, LocationService.class);
+                Intent serviceIntent = new Intent(LocationActivity.this, LocationService.class);
                 stopService(serviceIntent);
 
             }
@@ -211,9 +215,9 @@ public class MainActivity extends AppCompatActivity {
                 int deletedRows = myDb.deleteData(DatabaseHelper.TABLE_NAME_1);
 
                 if(deletedRows > 0)
-                    Toast.makeText(MainActivity.this, deletedRows + " Rows Deleted", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LocationActivity.this, deletedRows + " Rows Deleted", Toast.LENGTH_LONG).show();
                 else
-                    Toast.makeText(MainActivity.this, "No Rows Deleted", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LocationActivity.this, "No Rows Deleted", Toast.LENGTH_LONG).show();
 
             }
 
@@ -230,9 +234,9 @@ public class MainActivity extends AppCompatActivity {
                 int deletedRows = myDb.deleteData(DatabaseHelper.TABLE_NAME_2);
 
                 if(deletedRows > 0)
-                    Toast.makeText(MainActivity.this, deletedRows + " Rows Deleted", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LocationActivity.this, deletedRows + " Rows Deleted", Toast.LENGTH_LONG).show();
                 else
-                    Toast.makeText(MainActivity.this, "No Rows Deleted", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LocationActivity.this, "No Rows Deleted", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -251,7 +255,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (haveNetworkConnection()) {
 
-                        Intent googleMaps = new Intent(MainActivity.this, MapActivity.class);
+                        Intent googleMaps = new Intent(LocationActivity.this, MapActivity.class);
 
                         googleMaps.putExtra("id", -1);
 
@@ -282,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
                     showMessage("Error", "No Final Coordinates Found");
                 else {
 
-                    Intent brandingIntent = new Intent(MainActivity.this, BrandingActivity.class);
+                    Intent brandingIntent = new Intent(LocationActivity.this, BrandingActivity.class);
                     startActivity(brandingIntent);
 
                 }

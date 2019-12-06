@@ -1,4 +1,4 @@
-package com.example.coordinates;
+package com.example.coordinates.location.misc;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,27 +19,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "location_info.db";
 
-    static final String TABLE_NAME_1 = "original_coordinates_table";
-    static final String TABLE_NAME_2 = "final_coordinates_table";
+    public static final String TABLE_NAME_1 = "original_coordinates_table";
+    public static final String TABLE_NAME_2 = "final_coordinates_table";
 
-    static final String TABLE_NAME_3 = "original_coordinates_table_copied";
+    public static final String TABLE_NAME_3 = "original_coordinates_table_copied";
 
-    static final String COL_1_1 = "ID";
-    static final String COL_2_1 = "LATITUDE";
-    static final String COL_3_1 = "LONGITUDE";
-    static final String COL_4_1 = "SPEED";
-    static final String COL_5_1 = "ALTITUDE";
-    static final String COL_6_1 = "DATETIME";
+    public static final String COL_1_1 = "ID";
+    public static final String COL_2_1 = "LATITUDE";
+    public static final String COL_3_1 = "LONGITUDE";
+    public static final String COL_4_1 = "SPEED";
+    public static final String COL_5_1 = "ALTITUDE";
+    public static final String COL_6_1 = "DATETIME";
 
-    static final String COL_1_2 = "ID";
-    static final String COL_2_2 = "LATITUDE";
-    static final String COL_3_2 = "LONGITUDE";
-    static final String COL_4_2 = "SPEED";
-    static final String COL_5_2 = "ALTITUDE";
-    static final String COL_6_2 = "DATETIME";
-    static final String COL_7_2 = "TIME_SPENT";
-    static final String COL_8_2 = "LISTVIEW_LOCATION";
-    static final String COL_9_2 = "LOCATION_NAME";
+    public static final String COL_1_2 = "ID";
+    public static final String COL_2_2 = "LATITUDE";
+    public static final String COL_3_2 = "LONGITUDE";
+    public static final String COL_4_2 = "SPEED";
+    public static final String COL_5_2 = "ALTITUDE";
+    public static final String COL_6_2 = "DATETIME";
+    public static final String COL_7_2 = "TIME_SPENT";
+    public static final String COL_8_2 = "LISTVIEW_LOCATION";
+    public static final String COL_9_2 = "LOCATION_NAME";
 
     private static final String COL_1_3 = "ID";
     private static final String COL_2_3 = "LATITUDE";
@@ -51,7 +51,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private String databasePath;
 
-    DatabaseHelper(@Nullable Context context) {
+    public DatabaseHelper(@Nullable Context context) {
 
         super(context, DATABASE_NAME, null, 1);
 
@@ -81,7 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    boolean insertData(String tableName, String coordinates_latitude, String coordinates_longitude, String coordinates_speed, String coordinates_altitude, String coordinates_dateTime, String coordinates_timeSpent, int listeviewLocation, String locationName) {
+    public boolean insertData(String tableName, String coordinates_latitude, String coordinates_longitude, String coordinates_speed, String coordinates_altitude, String coordinates_dateTime, String coordinates_timeSpent, int listeviewLocation, String locationName) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -138,7 +138,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Integer deleteDataByRowID(String tableName, int id) {
+    public Integer deleteDataByRowID(String tableName, int id) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -151,7 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Integer deleteDataByRowLocationID(int locationID) {
+    public Integer deleteDataByRowLocationID(int locationID) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -159,7 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Integer deleteData(String tableName) {
+    public Integer deleteData(String tableName) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -167,7 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Integer deleteLastRow(String tableName) {
+    public Integer deleteLastRow(String tableName) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -181,7 +181,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Cursor getAllData(String tableName) {
+    public Cursor getAllData(String tableName) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -189,7 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Cursor getDataByLocation(int listViewLocation) {
+    public Cursor getDataByLocation(int listViewLocation) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -197,7 +197,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Cursor getLastRecord(String tableName) {
+    public Cursor getLastRecord(String tableName) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -208,7 +208,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Cursor getSecondToLastRecord(String tableName) {
+    public Cursor getSecondToLastRecord(String tableName) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -219,7 +219,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    void duplicateDatabase(String destinationTable, String sourceTable) {
+    public void duplicateDatabase(String destinationTable, String sourceTable) {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -229,7 +229,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    void saveDatabaseToSDCard() {
+    public void saveDatabaseToSDCard() {
 
         try {
 

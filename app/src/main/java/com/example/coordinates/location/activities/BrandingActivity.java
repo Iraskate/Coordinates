@@ -1,4 +1,4 @@
-package com.example.coordinates;
+package com.example.coordinates.location.activities;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +20,9 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+
+import com.example.coordinates.R;
+import com.example.coordinates.location.misc.DatabaseHelper;
 
 import java.util.ArrayList;
 
@@ -73,18 +76,18 @@ public class BrandingActivity extends AppCompatActivity implements PopupMenu.OnM
             if(res.getString(8) == null) {
 
                 listItem.add("Location " + (res.getInt(7) + 1) + ": " + //Location number
-                        "\n     " + /*DatabaseHelper.COL_2_2*/ "Latitude" + ": " + res.getString(1) + //Location latitude
-                        "\n     " + /*DatabaseHelper.COL_3_2*/ "Longitude" + ": " + res.getString(2) + //Location longitude
-                        "\n     " + /*DatabaseHelper.COL_7_2*/ "Time on location" + ": " + res.getString(6) + " minutes"); //Location time spent
+                        "\n     " + "Latitude" + ": " + res.getString(1) + //Location latitude
+                        "\n     " + "Longitude" + ": " + res.getString(2) + //Location longitude
+                        "\n     " + "Time on location" + ": " + res.getString(6) + " minutes"); //Location time spent
 
             }
             else {
 
                 listItem.add("Location " + (res.getInt(7) + 1) + ": " + //Location number
-                        "\n     " + /*DatabaseHelper.COL_2_2*/ "Latitude" + ": " + res.getString(1) + //Location latitude
-                        "\n     " + /*DatabaseHelper.COL_3_2*/ "Longitude" + ": " + res.getString(2) + //Location longitude
-                        "\n     " + /*DatabaseHelper.COL_7_2*/ "Time on location"+ ": " + res.getString(6) + " minutes" + //Location time spent
-                        "\n     " + /*DatabaseHelper.COL_9_2*/ "Location name" + ": " + res.getString(8)); //Location name
+                        "\n     " + "Latitude" + ": " + res.getString(1) + //Location latitude
+                        "\n     " + "Longitude" + ": " + res.getString(2) + //Location longitude
+                        "\n     " + "Time on location"+ ": " + res.getString(6) + " minutes" + //Location time spent
+                        "\n     " + "Location name" + ": " + res.getString(8)); //Location name
 
             }
 

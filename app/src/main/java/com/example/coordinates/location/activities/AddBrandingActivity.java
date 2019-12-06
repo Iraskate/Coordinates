@@ -1,4 +1,4 @@
-package com.example.coordinates;
+package com.example.coordinates.location.activities;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +10,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.example.coordinates.R;
+import com.example.coordinates.location.misc.DatabaseHelper;
 
 public class AddBrandingActivity extends AppCompatActivity {
 
