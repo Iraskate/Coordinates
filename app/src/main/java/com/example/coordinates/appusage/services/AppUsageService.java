@@ -129,7 +129,7 @@ public class AppUsageService extends Service {
                 packageName = packageName.substring(0, 1).toUpperCase() + packageName.substring(1);
 
                 //Convert milliseconds into hours
-                long hours = TimeUnit.MILLISECONDS.toHours(5000000);
+                long hours = TimeUnit.MILLISECONDS.toHours(queryUsageStats.get(i).getTotalTimeInForeground());
 
                 if(hours >= SHOW_NOTIFICATION_AFTER_HOURS)
                     initNotification(packageName, i + 3);

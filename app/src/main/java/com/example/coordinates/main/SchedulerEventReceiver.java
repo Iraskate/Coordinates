@@ -15,6 +15,9 @@ import androidx.core.content.ContextCompat;
 import com.example.coordinates.appusage.services.AppUsageService;
 import com.example.coordinates.location.services.LocationService;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import static android.app.AppOpsManager.MODE_ALLOWED;
 
 public class SchedulerEventReceiver extends BroadcastReceiver {
@@ -24,19 +27,42 @@ public class SchedulerEventReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.d(APP_TAG, "SchedulerEventReceiver.onReceive() called");
+        Date dateTimeToStopExecuting = SchedulerSetupReceiver.dateTimeExecuted;
+        Date currentDateTime = getCurrentDateTime();
 
-        if(checkLocationPermission(context) && checkUsageStatsPermission(context)) {
+        Log.d("Compare DateTime", String.valueOf(dateTimeToStopExecuting));
+        Log.d("Current DateTime", String.valueOf(currentDateTime));
 
-            //Location Service
-            Intent eventService1 = new Intent(context, LocationService.class);
-            ContextCompat.startForegroundService(context, eventService1);
+        if(!dateTimeToStopExecuting.before(currentDateTime)) {
 
-            //App Usage Service
-            Intent eventService2 = new Intent(context, AppUsageService.class);
-            ContextCompat.startForegroundService(context, eventService2);
+            Log.d(APP_TAG, "SchedulerEventReceiver.onReceive() called");
+
+            if (checkLocationPermission(context) && checkUsageStatsPermission(context)) {
+
+                //Location Service
+                Intent eventService1 = new Intent(context, LocationService.class);
+                ContextCompat.startForegroundService(context, eventService1);
+
+                //App Usage Service
+                Intent eventService2 = new Intent(context, AppUsageService.class);
+                ContextCompat.startForegroundService(context, eventService2);
+
+            }
+
+        } else {
+
+            Log.d(APP_TAG, "Alarm Manager Cancelled");
+            SchedulerSetupReceiver.alarmManager.cancel(SchedulerSetupReceiver.intentExecuted);
 
         }
+
+    }
+
+    private Date getCurrentDateTime() {
+
+        Calendar cal = Calendar.getInstance();
+
+        return cal.getTime();
 
     }
 
@@ -51,14 +77,8 @@ public class SchedulerEventReceiver extends BroadcastReceiver {
 
     private boolean checkLocationPermission(Context context) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            } else
-                return true;
-
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
         return true;
 

@@ -69,6 +69,8 @@ public class LocationService extends Service {
 
         getLocation();
 
+        stopSelf();
+
         return START_NOT_STICKY;
 
     }
@@ -229,8 +231,6 @@ public class LocationService extends Service {
             myDb.saveDatabaseToSDCard();
 
         }
-
-        stopSelf();
 
     }
 
